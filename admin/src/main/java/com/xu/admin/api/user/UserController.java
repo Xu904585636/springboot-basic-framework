@@ -19,6 +19,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.annotation.PostConstruct;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import java.util.List;
 
 @RestController
@@ -31,10 +34,35 @@ public class UserController {
     @Autowired
     RedisUtil redisUtil;
 
+    public UserController(){
+        log.info("UserController构造方法");
+    }
+
+    {
+        log.info("加载代码块");
+    }
+
+    static {
+        log.info("加载静态代码块");
+    }
+
+    /**
+     * 加载顺序
+     * 启动的时候 先初始化静态代码块 然后代码块 然后构造方法 然后init方法
+     */
+    @PostConstruct
+    public void init(){
+        log.info("userController init methor");
+    }
+
     @RequestMapping("userList")
     @ApiOperation(value = "获取所有用户列表",notes = "9999")
     @SystemLog(description = "111",methodType = "select")
-    public ResultInfo userList(){
+    public ResultInfo userList(HttpServletRequest request){
+        UserController userController = new UserController();
+
+        HttpSession session = request.getSession();
+
         List<User> list = userService.list();
         User user = userService.getUserById(1);
         ResultInfo resultInfo = new ResultInfo(ResultStatus.SUCCESS);
